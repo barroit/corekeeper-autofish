@@ -9,8 +9,9 @@ if [[ ! $1 || ! -d $dest ]]; then
 	exit 128
 fi
 
-mkdir -p $dest/$name
 __name=${name,,}
+
+ln -s $PWD/$__name $dest/$name
 
 for file in $__name.asmdef*; do
 	ln -s $PWD/$file $dest/$name/$name.${file#*.}

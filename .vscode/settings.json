@@ -1,0 +1,14 @@
+{
+	"fileHeaderComment.parameter": {
+		"*": {
+			"license": "GPL-3.0-or-later",
+			"year": "2024"
+		}
+	},
+	"files.associations": {
+		"DRAFT": "plaintext",
+		"TAGGING": "plaintext",
+		"NOTE": "plaintext",
+		"SETUP": "plaintext"
+	}
+}

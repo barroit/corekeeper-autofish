@@ -1,0 +1,17 @@
+Steps of setup
+==============
+
+How to
+------
+Just run .setup.sh. This script will create the necessary symlinks in the SDK
+directory.
+
+Why
+---
+CoreKeeper requires the project to be embedded in their SDK. This terrible
+design breaks the independence between projects and the API. To address this,
+we use symlinks to isolate our project from their SDK.
+
+This approach also simplifies SDK updates, as they recommend:
+  Instead of trying to update your modding SDK, it is best to clone and set up
+  a new one from scratch every time an update is released.

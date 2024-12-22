@@ -10,8 +10,5 @@
 		"TAGGING": "plaintext",
 		"NOTE": "plaintext",
 		"SETUP": "plaintext"
-	},
-	"files.exclude": {
-		"autofish/AutoFish.asmdef*": true
 	}
 }

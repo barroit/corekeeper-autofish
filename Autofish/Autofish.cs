@@ -14,6 +14,7 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.NetCode;
 
+using PlayerEquipment;
 using PlayerState;
 
 using static CommandInputButtonNames;
@@ -115,15 +116,20 @@ protected override void OnUpdate()
 	RefRW<AutofishCD> __fisher = SystemAPI.GetSingletonRW<AutofishCD>();
 	AutofishCD fisher = __fisher.ValueRW;
 
-	foreach (var (__input, __fishing, __player) in
+	foreach (var (__input, __fishing, __player, __slot) in
 		 SystemAPI.Query<RefRW<ClientInputData>,
 				 RefRO<FishingStateCD>,
-				 RefRO<PlayerStateCD>>()
+				 RefRO<PlayerStateCD>,
+				 RefRO<EquipmentSlotCD>>()
 			  .WithAll<GhostOwnerIsLocal>()) {
 		ClientInput input = As<ClientInputData,
 				       ClientInput>(ref __input.ValueRW);
 		FishingStateCD fishing = __fishing.ValueRO;
 		PlayerStateCD player = __player.ValueRO;
+		EquipmentSlotCD slot = __slot.ValueRO;
+
+		if (slot.slotType != EquipmentSlotType.FishingRodSlot)
+			continue;
 
 		autofish(ref input, in fishing,
 			 in player, ref fisher, in tick);

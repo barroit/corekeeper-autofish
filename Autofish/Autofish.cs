@@ -24,7 +24,6 @@ public struct AutofishCD : IComponentData
 {
 	public TickTimer cd;
 	public TickTimer clicking;
-	public TickTimer pullup_delay;
 	public bool enabled;
 }
 
@@ -52,13 +51,13 @@ protected override void OnCreate()
 	AutofishCD fisher = new AutofishCD {
 		cd           = new TickTimer(0.5f, rate),
 		clicking     = new TickTimer(0.2f, rate),
-		pullup_delay = new TickTimer(0.3f, rate),
 		enabled      = false,
 	};
 
 	EntityManager.SetComponentData(ent, fisher);
 }
 
+[BurstCompile]
 private void autofish(ref ClientInput input,
 		      in FishingStateCD fishing,
 		      in PlayerStateCD player,
@@ -69,10 +68,6 @@ private void autofish(ref ClientInput input,
 	    (!fisher.cd.isRunning || fisher.cd.IsTimerElapsed(tick))) {
 		fisher.cd.Start(tick);
 		fisher.enabled = !fisher.enabled;
-
-		if (!fisher.enabled) {
-			fisher.pullup_delay.Stop(tick);
-		}
 	}
 
 	if (!fisher.enabled)
@@ -87,24 +82,10 @@ private void autofish(ref ClientInput input,
 		fisher.clicking.Stop(tick);
 	}
 
-	if (player.currentState != PlayerStateEnum.Fishing) {
+	if (player.currentState != PlayerStateEnum.Fishing)
 		fisher.clicking.Start(tick);
-		return;
-	}
-
-	if (!fishing.fishIsNibbling || fishing.isFishingAtOctopusBoss)
-		return;
-
-	if (!fisher.pullup_delay.isRunning) {
-		fisher.pullup_delay.Start(tick);
-		return;
-	}
-
-	if (fisher.pullup_delay.isRunning &&
-	     fisher.pullup_delay.IsTimerElapsed(tick)) {
-		fisher.pullup_delay.Stop(tick);
+	else if (fishing.fishIsNibbling && !fishing.isFishingAtOctopusBoss)
 		fisher.clicking.Start(tick);
-	}
 }
 
 [BurstCompile]

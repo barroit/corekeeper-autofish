@@ -22,12 +22,15 @@ using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 public struct AutofishCD : IComponentData
 {
 	public TickTimer cd;
-	public TickTimer delay;
-	public TickTimer pullup;
+	public TickTimer clicking;
+	public TickTimer pullup_delay;
+	public TickTimer throw_delay;
 
-	public bool is_active;
-	public bool need_pull;
-	public bool need_thrw;
+	public bool enabled;
+	public bool busy;
+
+	public int pull;
+	public int thrw;
 }
 
 [BurstCompile]
@@ -52,12 +55,12 @@ protected override void OnCreate()
 	 *	allowedToLeaveStateTimer = new TickTimer(0.1f, rate),
 	 */
 	AutofishCD fisher = new AutofishCD {
-		cd        = new TickTimer(0.5f, rate),
-		delay     = new TickTimer(0.6f, rate),
-		pullup    = new TickTimer(0.9f, rate),
-		is_active = false,
-		need_pull = false,
-		need_thrw = false,
+		cd           = new TickTimer(0.5f, rate),
+		clicking     = new TickTimer(0.2f, rate),
+		pullup_delay = new TickTimer(0.3f, rate),
+		throw_delay  = new TickTimer(0.9f, rate),
+		enabled      = false,
+		busy         = false,
 	};
 
 	EntityManager.SetComponentData(ent, fisher);
@@ -83,51 +86,49 @@ protected override void OnUpdate()
 		if (input.IsButtonSet(SecondInteract_HeldDown) &&
 		    (!fisher.cd.isRunning || fisher.cd.IsTimerElapsed(tick))) {
 			fisher.cd.Start(tick);
-			fisher.is_active = !fisher.is_active;
+			fisher.enabled = !fisher.enabled;
 
-			if (!fisher.is_active) {
-				fisher.need_pull = false;
-				fisher.need_thrw = false;
-
-				fisher.delay.Stop(tick);
-				fisher.pullup.Stop(tick);
+			if (!fisher.enabled) {
+				fisher.pullup_delay.Stop(tick);
+				fisher.throw_delay.Stop(tick);
 			}
 		}
 
-		if (!fisher.is_active)
+		if (!fisher.enabled)
 			continue;
 
-		bool pulled = fisher.pullup.isRunning &&
-			      fisher.pullup.IsTimerElapsed(tick);
+		if (fisher.clicking.isRunning) {
+			if (!fisher.clicking.IsTimerElapsed(tick)) {
+				input.SetButton(SecondInteract_HeldDown, true);
+				__input.ValueRW = As<ClientInput,
+						     ClientInputData>(ref input);
+				continue;
+			}
+			fisher.clicking.Stop(tick);
+		}
 
-		if (fisher.need_pull || pulled) {
-			fisher.pullup.Stop(tick);
-			fisher.need_pull = !fisher.need_pull;
-			goto emit_click;
+		if (fisher.throw_delay.isRunning &&
+		    fisher.throw_delay.IsTimerElapsed(tick)) {
+			fisher.throw_delay.Stop(tick);
+			fisher.clicking.Start(tick);
+			continue;
 		}
 
 		if (!state.fishIsNibbling || state.isFishingAtOctopusBoss)
 			continue;
 
-		if (!fisher.pullup.isRunning && !fisher.delay.isRunning) {
-			fisher.delay.Start(tick);
+		if (!fisher.throw_delay.isRunning &&
+		    !fisher.pullup_delay.isRunning) {
+			fisher.pullup_delay.Start(tick);
 			continue;
 		}
 
-		bool delayed = fisher.delay.isRunning &&
-			       fisher.delay.IsTimerElapsed(tick);
-
-		if (fisher.need_thrw || delayed) {
-			fisher.delay.Stop(tick);
-			fisher.pullup.Start(tick);
-			fisher.need_thrw = !fisher.need_thrw;
-			goto emit_click;
+		if (fisher.pullup_delay.isRunning &&
+		    fisher.pullup_delay.IsTimerElapsed(tick)) {
+			fisher.pullup_delay.Stop(tick);
+			fisher.throw_delay.Start(tick);
+			fisher.clicking.Start(tick);
 		}
-
-		continue;
-emit_click:
-		input.SetButton(SecondInteract_HeldDown, true);
-		__input.ValueRW = As<ClientInput, ClientInputData>(ref input);
 	}
 
 	__fisher.ValueRW = fisher;

@@ -24,7 +24,6 @@ public struct AutofishCD : IComponentData
 	public TickTimer cd;
 	public TickTimer clicking;
 	public TickTimer pullup_delay;
-	public TickTimer throw_delay;
 	public bool enabled;
 }
 
@@ -53,16 +52,15 @@ protected override void OnCreate()
 		cd           = new TickTimer(0.5f, rate),
 		clicking     = new TickTimer(0.2f, rate),
 		pullup_delay = new TickTimer(0.3f, rate),
-		throw_delay  = new TickTimer(0.9f, rate),
 		enabled      = false,
 	};
 
 	EntityManager.SetComponentData(ent, fisher);
 }
 
-[BurstCompile]
 private void autofish(ref ClientInput input,
-		      in FishingStateCD state,
+		      in FishingStateCD fishing,
+		      in PlayerStateCD player,
 		      ref AutofishCD fisher,
 		      in NetworkTick tick)
 {
@@ -73,7 +71,6 @@ private void autofish(ref ClientInput input,
 
 		if (!fisher.enabled) {
 			fisher.pullup_delay.Stop(tick);
-			fisher.throw_delay.Stop(tick);
 		}
 	}
 
@@ -89,17 +86,15 @@ private void autofish(ref ClientInput input,
 		fisher.clicking.Stop(tick);
 	}
 
-	if (fisher.throw_delay.isRunning &&
-	    fisher.throw_delay.IsTimerElapsed(tick)) {
-		fisher.throw_delay.Stop(tick);
+	if (player.currentState != PlayerStateEnum.Fishing) {
 		fisher.clicking.Start(tick);
 		return;
 	}
 
-	if (!state.fishIsNibbling || state.isFishingAtOctopusBoss)
+	if (!fishing.fishIsNibbling || fishing.isFishingAtOctopusBoss)
 		return;
 
-	if (!fisher.throw_delay.isRunning && !fisher.pullup_delay.isRunning) {
+	if (!fisher.pullup_delay.isRunning) {
 		fisher.pullup_delay.Start(tick);
 		return;
 	}
@@ -107,7 +102,6 @@ private void autofish(ref ClientInput input,
 	if (fisher.pullup_delay.isRunning &&
 	     fisher.pullup_delay.IsTimerElapsed(tick)) {
 		fisher.pullup_delay.Stop(tick);
-		fisher.throw_delay.Start(tick);
 		fisher.clicking.Start(tick);
 	}
 }
@@ -121,15 +115,18 @@ protected override void OnUpdate()
 	RefRW<AutofishCD> __fisher = SystemAPI.GetSingletonRW<AutofishCD>();
 	AutofishCD fisher = __fisher.ValueRW;
 
-	foreach (var (__input, __state) in
+	foreach (var (__input, __fishing, __player) in
 		 SystemAPI.Query<RefRW<ClientInputData>,
-				 RefRO<FishingStateCD>>()
+				 RefRO<FishingStateCD>,
+				 RefRO<PlayerStateCD>>()
 			  .WithAll<GhostOwnerIsLocal>()) {
 		ClientInput input = As<ClientInputData,
 				       ClientInput>(ref __input.ValueRW);
-		FishingStateCD state = __state.ValueRO;
+		FishingStateCD fishing = __fishing.ValueRO;
+		PlayerStateCD player = __player.ValueRO;
 
-		autofish(ref input, in state, ref fisher, in tick);
+		autofish(ref input, in fishing,
+			 in player, ref fisher, in tick);
 		__input.ValueRW = As<ClientInput, ClientInputData>(ref input);
 	}
 

@@ -101,8 +101,28 @@ protected override void OnUpdate()
 		PlayerStateCD player = __player.ValueRO;
 		EquipmentSlotCD slot = __slot.ValueRO;
 
-		if (slot.slotType != EquipmentSlotType.FishingRodSlot)
+		if (fishing.useFishingMiniGame ||
+		    slot.slotType != EquipmentSlotType.FishingRodSlot)
 			continue;
+
+		if (Manager.ui.isAnyInventoryShowing ||
+		    Manager.menu.IsAnyMenuActive()) {
+			fisher.fishing = false;
+			if (fisher.clicking.isRunning)
+				fisher.clicking.Stop(tick);
+			continue;
+		}
+
+		if (fisher.clicking.isRunning &&
+		    input.IsButtonSet(SecondInteract_HeldDown)) {
+			fisher.fishing = false;
+			/*
+			 * Skip the current tick.
+			 */
+			tick.Decrement();
+			fisher.clicking.Stop(tick);
+			continue;
+		}
 
 		autofish(ref input, in fishing,
 			 in player, ref fisher, in tick);

@@ -1,0 +1,20 @@
+Note
+====
+
+Generated files
+---------------
+Make sure the mod Scripts/ directory contains a Generated/ directory. The
+compiled SystemAPI queries are stored in that place.
+
+Uploading mod
+-------------
+Be aware that mod.io may wrap an extra directory to the mod zip file, which
+will break Core Keeper to load the mod. Making the file name aggressively
+unique solves this.
+
+Configuration
+-------------
+Autofish.asset metadata
+
+	Leave MonoBehaviour.metadata.files empty and let SDK generate it
+	for us, as BurstCompile generates files with random names.

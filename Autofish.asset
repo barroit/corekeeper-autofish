@@ -23,9 +23,9 @@ MonoBehaviour:
     files: []
     dependencies: []
   modPath: Assets/Autofish
-  forceReimport: 1
+  forceReimport: 0
   buildBundles: 1
-  cacheBundles: 0
+  cacheBundles: 1
   buildLinux: 1
   assets: []
   lastBuildLinux: 0

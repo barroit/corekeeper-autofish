@@ -16,7 +16,7 @@ using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 public struct AutofishCD : IComponentData
 {
 	public TickTimer clicking;
-	public bool fishing;
+	public bool pulled;
 }
 
 [BurstCompile]
@@ -32,8 +32,8 @@ protected override void OnCreate()
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
 
 	AutofishCD fisher = new AutofishCD {
-		clicking = new TickTimer(0.05f, rate),
-		fishing  = false,
+		clicking = new TickTimer(0.1f, rate),
+		pulled   = false,
 	};
 
 	EntityManager.SetComponentData(ent, fisher);
@@ -55,12 +55,12 @@ private void autofish(ref ClientInput input,
 		fisher.clicking.Stop(tick);
 	}
 
-	if (fisher.fishing && player.currentState != PlayerStateEnum.Fishing) {
+	if (fisher.pulled && player.currentState != PlayerStateEnum.Fishing) {
 		fisher.clicking.Start(tick);
-		fisher.fishing = false;
+		fisher.pulled = false;
 	} else if (fishing.fishIsNibbling && !fishing.isFishingAtOctopusBoss) {
 		fisher.clicking.Start(tick);
-		fisher.fishing = true;
+		fisher.pulled = true;
 	}
 }
 
@@ -91,20 +91,14 @@ protected override void OnUpdate()
 
 		if (Manager.ui.isAnyInventoryShowing ||
 		    Manager.menu.IsAnyMenuActive()) {
-			fisher.fishing = false;
+			fisher.pulled = false;
 			if (fisher.clicking.isRunning)
 				fisher.clicking.Stop(tick);
 			continue;
 		}
 
-		if (fisher.clicking.isRunning &&
-		    input.IsButtonSet(SecondInteract_HeldDown)) {
-			fisher.fishing = false;
-			/*
-			 * Skip the current tick.
-			 */
-			tick.Decrement();
-			fisher.clicking.Stop(tick);
+		if (input.IsButtonSet(SecondInteract_HeldDown)) {
+			fisher.pulled = false;
 			continue;
 		}
 

@@ -22,9 +22,8 @@ using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
 public struct AutofishCD : IComponentData
 {
-	public TickTimer cd;
 	public TickTimer clicking;
-	public bool enabled;
+	public bool fishing;
 }
 
 [BurstCompile]
@@ -49,9 +48,8 @@ protected override void OnCreate()
 	 *	allowedToLeaveStateTimer = new TickTimer(0.1f, rate),
 	 */
 	AutofishCD fisher = new AutofishCD {
-		cd       = new TickTimer(0.5f, rate),
 		clicking = new TickTimer(0.05f, rate),
-		enabled  = false,
+		fishing  = false,
 	};
 
 	EntityManager.SetComponentData(ent, fisher);
@@ -64,15 +62,6 @@ private void autofish(ref ClientInput input,
 		      ref AutofishCD fisher,
 		      in NetworkTick tick)
 {
-	if (input.IsButtonSet(SecondInteract_HeldDown) &&
-	    (!fisher.cd.isRunning || fisher.cd.IsTimerElapsed(tick))) {
-		fisher.cd.Start(tick);
-		fisher.enabled = !fisher.enabled;
-	}
-
-	if (!fisher.enabled)
-		return;
-
 	if (fisher.clicking.isRunning) {
 		if (!fisher.clicking.IsTimerElapsed(tick)) {
 			input.SetButton(SecondInteract_HeldDown, true);
@@ -82,10 +71,13 @@ private void autofish(ref ClientInput input,
 		fisher.clicking.Stop(tick);
 	}
 
-	if (player.currentState != PlayerStateEnum.Fishing)
+	if (fisher.fishing && player.currentState != PlayerStateEnum.Fishing) {
 		fisher.clicking.Start(tick);
-	else if (fishing.fishIsNibbling && !fishing.isFishingAtOctopusBoss)
+		fisher.fishing = false;
+	} else if (fishing.fishIsNibbling && !fishing.isFishingAtOctopusBoss) {
 		fisher.clicking.Start(tick);
+		fisher.fishing = true;
+	}
 }
 
 [BurstCompile]

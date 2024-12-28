@@ -3,13 +3,6 @@
  * Copyright 2024 Jiamu Sun <barroit@linux.com>
  */
 
-/*
- * Core Keeper resets our state every time we enter a world. We rely on this
- * mechanism to implement the systems, as the system chain requires at least
- * one Walk state (current and next) to exist in PlayerState before the player
- * goes fishing.
- */
-
 using Unity.Burst;
 using Unity.Entities;
 using Unity.NetCode;
@@ -38,15 +31,6 @@ protected override void OnCreate()
 	Entity ent = EntityManager.CreateSingleton<AutofishCD>();
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
 
-	/*
-	 * See Pug.ECS.Conversion/PlayerAuthoringConverter.cs for the first
-	 * argument of TickTimer constructor.
-	 * For 1.0.1.11
-	 *	castTimer = new TickTimer(1f, rate),
-	 *	throwTimer = new TickTimer(1f / 3f, rate),
-	 *	pullUpTimer = new TickTimer(0.75f, rate),
-	 *	allowedToLeaveStateTimer = new TickTimer(0.1f, rate),
-	 */
 	AutofishCD fisher = new AutofishCD {
 		clicking = new TickTimer(0.05f, rate),
 		fishing  = false,

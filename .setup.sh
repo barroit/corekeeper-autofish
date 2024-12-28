@@ -9,7 +9,7 @@ if [[ ! $1 || ! -d $dest ]]; then
 fi
 
 dest=$1/Assets
-name=$(cat NAME)
+name=$(cat name)
 
 ln -s $PWD/$name $dest/$name
 

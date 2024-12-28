@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d83df2ae64ce1e94f9c006b9d326bf02, type: 3}
   m_Name: Autofish_modio
   m_EditorClassIdentifier: 
-  modId: 0
+  modId: 4594638
   modSettings: {fileID: 11400000, guid: 34d4a1a7a08c7363581cd5099d8ebc33, type: 2}
   logo: {fileID: 0}
-  summary: 
+  summary: Autofish is a lightweight, life-saving tool for automated fishing. Whether
+    you're tired of repetitive tasks or just need a break, Autofish handles the fishing
+    for you, so you can relax and enjoy your downtime.

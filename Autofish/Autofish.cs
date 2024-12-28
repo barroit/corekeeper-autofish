@@ -49,9 +49,9 @@ protected override void OnCreate()
 	 *	allowedToLeaveStateTimer = new TickTimer(0.1f, rate),
 	 */
 	AutofishCD fisher = new AutofishCD {
-		cd           = new TickTimer(0.5f, rate),
-		clicking     = new TickTimer(0.2f, rate),
-		enabled      = false,
+		cd       = new TickTimer(0.5f, rate),
+		clicking = new TickTimer(0.05f, rate),
+		enabled  = false,
 	};
 
 	EntityManager.SetComponentData(ent, fisher);

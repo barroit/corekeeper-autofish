@@ -85,9 +85,10 @@ protected override void OnUpdate()
 		PlayerStateCD player = __player.ValueRO;
 		EquipmentSlotCD slot = __slot.ValueRO;
 
-		if (fishing.useFishingMiniGame ||
-		    slot.slotType != EquipmentSlotType.FishingRodSlot)
+		if (slot.slotType != EquipmentSlotType.FishingRodSlot)
 			continue;
+
+		input.useFishingMiniGame = false;
 
 		if (Manager.ui.isAnyInventoryShowing ||
 		    Manager.menu.IsAnyMenuActive()) {
@@ -99,11 +100,13 @@ protected override void OnUpdate()
 
 		if (input.IsButtonSet(SecondInteract_HeldDown)) {
 			fisher.pulled = false;
-			continue;
+			goto next;
 		}
 
 		autofish(ref input, in fishing,
 			 in player, ref fisher, in tick);
+
+next:
 		__input.ValueRW = As<ClientInput, ClientInputData>(ref input);
 	}
 

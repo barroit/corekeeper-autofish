@@ -13,25 +13,26 @@ using PlayerState;
 using static CommandInputButtonNames;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
-public struct AutofishCD : IComponentData
+public struct FisherCD : IComponentData
 {
 	public TickTimer clicking;
 	public bool pulled;
+	public bool enabled;
 }
 
 [BurstCompile]
 [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
 [UpdateInGroup(typeof(RunSimulationSystemGroup), OrderLast = true)]
 [UpdateAfter(typeof(SendClientInputSystem))]
-public partial class Autofish : SystemBase
+public partial class Fisher : SystemBase
 {
 
 protected override void OnCreate()
 {
-	Entity ent = EntityManager.CreateSingleton<AutofishCD>();
+	Entity ent = EntityManager.CreateSingleton<FisherCD>();
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
 
-	AutofishCD fisher = new AutofishCD {
+	FisherCD fisher = new FisherCD {
 		clicking = new TickTimer(0.1f, rate),
 		pulled   = false,
 	};
@@ -40,38 +41,13 @@ protected override void OnCreate()
 }
 
 [BurstCompile]
-private void autofish(ref ClientInput input,
-		      in FishingStateCD fishing,
-		      in PlayerStateCD player,
-		      ref AutofishCD fisher,
-		      in NetworkTick tick)
-{
-	if (fisher.clicking.isRunning) {
-		if (!fisher.clicking.IsTimerElapsed(tick)) {
-			input.SetButton(SecondInteract_HeldDown, true);
-			return;
-		}
-
-		fisher.clicking.Stop(tick);
-	}
-
-	if (fisher.pulled && player.currentState != PlayerStateEnum.Fishing) {
-		fisher.clicking.Start(tick);
-		fisher.pulled = false;
-	} else if (fishing.fishIsNibbling && !fishing.isFishingAtOctopusBoss) {
-		fisher.clicking.Start(tick);
-		fisher.pulled = true;
-	}
-}
-
-[BurstCompile]
 protected override void OnUpdate()
 {
 	NetworkTime time = SystemAPI.GetSingleton<NetworkTime>();
 	NetworkTick tick = time.ServerTick;
 
-	RefRW<AutofishCD> __fisher = SystemAPI.GetSingletonRW<AutofishCD>();
-	AutofishCD fisher = __fisher.ValueRW;
+	RefRW<FisherCD> __fisher = SystemAPI.GetSingletonRW<FisherCD>();
+	FisherCD fisher = __fisher.ValueRW;
 
 	foreach (var (__input, __fishing, __player, __slot) in
 		 SystemAPI.Query<RefRW<ClientInputData>,
@@ -103,8 +79,24 @@ protected override void OnUpdate()
 			goto next;
 		}
 
-		autofish(ref input, in fishing,
-			 in player, ref fisher, in tick);
+		if (fisher.clicking.isRunning) {
+			if (!fisher.clicking.IsTimerElapsed(tick)) {
+				input.SetButton(SecondInteract_HeldDown, true);
+				goto next;
+			}
+
+			fisher.clicking.Stop(tick);
+		}
+
+		if (fisher.pulled &&
+		    player.currentState != PlayerStateEnum.Fishing) {
+			fisher.clicking.Start(tick);
+			fisher.pulled = false;
+		} else if (fishing.fishIsNibbling &&
+			   !fishing.isFishingAtOctopusBoss) {
+			fisher.clicking.Start(tick);
+			fisher.pulled = true;
+		}
 
 next:
 		__input.ValueRW = As<ClientInput, ClientInputData>(ref input);

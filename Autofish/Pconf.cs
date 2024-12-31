@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: ${license}
 /*
- * Copyright 2024 Jiamu Sun <barroit@linux.com>
+ * Copyright 2024, 2025 Jiamu Sun <barroit@linux.com>
  */
 
 /*
@@ -18,11 +18,20 @@ using PugMod;
 public class Pconf
 {
 
-public static string mod;
+private static Pconf pconf;
 
-public static T get<T>(string name)
+private string mod;
+private IConfigFilesystem fs;
+
+public Pconf(string mod, IConfigFilesystem fs)
 {
-	IConfigFilesystem fs = API.ConfigFilesystem;
+	this.mod = mod;
+	this.fs = fs;
+	pconf = this;
+}
+
+private T __get<T>(string name) where T : struct
+{
 	string file = $"{mod}/{name}.json";
 
 	if (!fs.FileExists(file))
@@ -34,7 +43,12 @@ public static T get<T>(string name)
 	return JsonUtility.FromJson<T>(json);
 }
 
-public static T get<T>(string name, in T defval) where T : struct
+public static T get<T>(string name) where T : struct
+{
+	return pconf.__get<T>(name);
+}
+
+private T __get<T>(string name, in T defval) where T : struct
 {
 	T ret = get<T>(name);
 
@@ -45,9 +59,13 @@ public static T get<T>(string name, in T defval) where T : struct
 	return defval;
 }
 
-public static void set<T>(string name, in T value)
+public static T get<T>(string name, in T defval) where T : struct
 {
-	IConfigFilesystem fs = API.ConfigFilesystem;
+	return pconf.__get(name, defval);
+}
+
+private void __set<T>(string name, in T value) where T : struct
+{
 	string file = $"{mod}/{name}.json";
 
 	if (!fs.DirectoryExists(mod))
@@ -57,6 +75,11 @@ public static void set<T>(string name, in T value)
 	byte[] data = Encoding.UTF8.GetBytes(json);
 
 	fs.Write(file, data);
+}
+
+public static void set<T>(string name, in T value) where T : struct
+{
+	pconf.__set(name, value);
 }
 
 } /* class Pconf */

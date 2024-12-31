@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
- * Copyright 2024 Jiamu Sun <barroit@linux.com>
+ * Copyright 2024, 2025 Jiamu Sun <barroit@linux.com>
  */
 
 using PugMod;
@@ -24,7 +24,7 @@ private int old_size = 0;
 
 public void EarlyInit()
 {
-	Pconf.mod = NAME;
+	new Pconf(NAME, API.ConfigFilesystem);
 }
 
 public void Init()

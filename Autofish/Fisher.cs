@@ -27,17 +27,21 @@ public struct FisherCD : IComponentData
 public partial class Fisher : SystemBase
 {
 
+public static World world;
+
 protected override void OnCreate()
 {
-	Entity ent = EntityManager.CreateSingleton<FisherCD>();
+	Entity entity = EntityManager.CreateSingleton<FisherCD>();
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
 
 	FisherCD fisher = new FisherCD {
 		clicking = new TickTimer(0.1f, rate),
 		pulled   = false,
+		enabled  = true,
 	};
 
-	EntityManager.SetComponentData(ent, fisher);
+	EntityManager.SetComponentData(entity, fisher);
+	world = World;
 }
 
 [BurstCompile]
@@ -48,6 +52,9 @@ protected override void OnUpdate()
 
 	RefRW<FisherCD> __fisher = SystemAPI.GetSingletonRW<FisherCD>();
 	FisherCD fisher = __fisher.ValueRW;
+
+	if (!fisher.enabled)
+		return;
 
 	foreach (var (__input, __fishing, __player, __slot) in
 		 SystemAPI.Query<RefRW<ClientInputData>,
@@ -105,4 +112,4 @@ next:
 	__fisher.ValueRW = fisher;
 }
 
-}
+} /* partial class Fisher */

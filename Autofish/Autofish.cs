@@ -9,6 +9,8 @@ using UnityEngine;
 public class Autofish : IMod
 {
 
+public static readonly string NAME = "autofish";
+
 private readonly string BTN_PREFAB = "Assets/Autofish/fisher_switch.prefab";
 
 private LoadedMod autofish;
@@ -20,7 +22,10 @@ private GameObject btn;
 private InventoryUI inv;
 private int old_size = 0;
 
-public void EarlyInit() {}
+public void EarlyInit()
+{
+	Pconf.mod = NAME;
+}
 
 public void Init()
 {

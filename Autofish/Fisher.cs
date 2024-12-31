@@ -3,6 +3,7 @@
  * Copyright 2024 Jiamu Sun <barroit@linux.com>
  */
 
+using System;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.NetCode;
@@ -20,6 +21,14 @@ public struct FisherCD : IComponentData
 	public bool enabled;
 }
 
+[Serializable]
+public struct Preference
+{
+
+public bool enabled;
+
+} /* struct Preference */
+
 [BurstCompile]
 [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
 [UpdateInGroup(typeof(RunSimulationSystemGroup), OrderLast = true)]
@@ -29,15 +38,21 @@ public partial class Fisher : SystemBase
 
 public static World world;
 
+private Preference pref = new Preference {
+	enabled = true,
+};
+
 protected override void OnCreate()
 {
+	pref = Pconf.get("settings", pref);
+
 	Entity entity = EntityManager.CreateSingleton<FisherCD>();
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
 
 	FisherCD fisher = new FisherCD {
 		clicking = new TickTimer(0.1f, rate),
 		pulled   = false,
-		enabled  = true,
+		enabled  = pref.enabled,
 	};
 
 	EntityManager.SetComponentData(entity, fisher);
@@ -110,6 +125,14 @@ next:
 	}
 
 	__fisher.ValueRW = fisher;
+}
+
+protected override void OnDestroy()
+{
+	FisherCD fisher = SystemAPI.GetSingleton<FisherCD>();
+
+	pref.enabled = fisher.enabled;
+	Pconf.set("settings", pref);
 }
 
 } /* partial class Fisher */

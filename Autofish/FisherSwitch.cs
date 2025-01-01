@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
- * Copyright 2024 Jiamu Sun <barroit@linux.com>
+ * Copyright 2024, 2025 Jiamu Sun <barroit@linux.com>
  */
 
 using I2.Loc;
@@ -22,24 +22,11 @@ public LocalizedString btn_off_msg;
 private readonly Color rod_disable = new Color(0.4235f, 0.3568f, 0.2901f, 1f);
 private readonly Color rod_enable = new Color(1f, 1f, 1f, 1f);
 
-private EntityManager manager;
-private Entity entity;
-
-protected override void Awake()
-{
-	base.Awake();
-
-	manager = Fisher.world.EntityManager;
-
-	EntityQuery query = manager.CreateEntityQuery(typeof(FisherCD));
-
-	entity = query.GetSingletonEntity();
-	optionalHoverDesc = btn_off_msg;
-}
-
 public void toggle_state()
 {
-	FisherCD fisher = manager.GetComponentData<FisherCD>(entity);
+	EntityManager manager = Fisher.manager;
+	Entity entity = Fisher.entity;
+	FisherCD fisher = manager.GetComponentData<FisherCD>(Fisher.entity);
 
 	fisher.enabled = !fisher.enabled;
 	manager.SetComponentData(entity, fisher);
@@ -47,6 +34,8 @@ public void toggle_state()
 
 protected override void LateUpdate()
 {
+	EntityManager manager = Fisher.manager;
+	Entity entity = Fisher.entity;
 	FisherCD fisher = manager.GetComponentData<FisherCD>(entity);
 
 	base.LateUpdate();

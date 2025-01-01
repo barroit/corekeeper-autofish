@@ -5,6 +5,7 @@
 
 using System;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.NetCode;
 
@@ -36,7 +37,8 @@ public bool enabled;
 public partial class Fisher : SystemBase
 {
 
-public static World world;
+public static Entity entity;
+public static EntityManager manager;
 
 private Preference pref = new Preference {
 	enabled = true,
@@ -45,18 +47,17 @@ private Preference pref = new Preference {
 protected override void OnCreate()
 {
 	pref = Pconf.get("settings", pref);
+	manager = EntityManager;
+	entity = manager.CreateSingleton<FisherCD>();
 
-	Entity entity = EntityManager.CreateSingleton<FisherCD>();
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
-
 	FisherCD fisher = new FisherCD {
 		clicking = new TickTimer(0.1f, rate),
 		pulled   = false,
 		enabled  = pref.enabled,
 	};
 
-	EntityManager.SetComponentData(entity, fisher);
-	world = World;
+	manager.SetComponentData(entity, fisher);
 }
 
 [BurstCompile]

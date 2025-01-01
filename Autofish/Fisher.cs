@@ -3,7 +3,6 @@
  * Copyright 2024, 2025 Jiamu Sun <barroit@linux.com>
  */
 
-using System;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.NetCode;
@@ -14,15 +13,9 @@ using PlayerState;
 using static CommandInputButtonNames;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
-public struct FisherCD : IComponentData {
+struct FisherCD : IComponentData {
 	public TickTimer tmr;
-	public bool active;
 }
-
-[Serializable]
-struct Preference {
-	public bool active;
-};
 
 [BurstCompile]
 [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
@@ -33,20 +26,14 @@ public partial class Fisher : SystemBase {
 public static Entity entity;
 public static EntityManager manager;
 
-private Preference pref = new Preference {
-	active = true,
-};
-
 protected override void OnCreate()
 {
-	pref = Pconf.get("settings", pref);
 	manager = EntityManager;
 	entity = manager.CreateSingleton<FisherCD>();
 
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
 	FisherCD fisher = new FisherCD {
 		tmr    = new TickTimer(0.2f, rate),
-		active = pref.active,
 	};
 
 	manager.SetComponentData(entity, fisher);
@@ -60,9 +47,6 @@ protected override void OnUpdate()
 
 	RefRW<FisherCD> __fisher = SystemAPI.GetSingletonRW<FisherCD>();
 	FisherCD fisher = __fisher.ValueRW;
-
-	if (!fisher.active)
-		return;
 
 	foreach (var (__input, __fishing, __slot) in
 		 SystemAPI.Query<RefRW<ClientInputData>,
@@ -106,14 +90,6 @@ next:
 	}
 
 	__fisher.ValueRW = fisher;
-}
-
-protected override void OnDestroy()
-{
-	FisherCD fisher = SystemAPI.GetSingleton<FisherCD>();
-
-	pref.active = fisher.active;
-	Pconf.set("settings", pref);
 }
 
 } /* partial class Fisher */

@@ -5,7 +5,6 @@
 
 using System;
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.NetCode;
 
@@ -65,16 +64,14 @@ protected override void OnUpdate()
 	if (!fisher.active)
 		return;
 
-	foreach (var (__input, __fishing, __player, __slot) in
+	foreach (var (__input, __fishing, __slot) in
 		 SystemAPI.Query<RefRW<ClientInputData>,
 				 RefRO<FishingStateCD>,
-				 RefRO<PlayerStateCD>,
 				 RefRO<EquipmentSlotCD>>()
 			  .WithAll<GhostOwnerIsLocal>()) {
 		ClientInput input = As<ClientInputData,
 				       ClientInput>(ref __input.ValueRW);
 		FishingStateCD fishing = __fishing.ValueRO;
-		PlayerStateCD player = __player.ValueRO;
 		EquipmentSlotCD slot = __slot.ValueRO;
 
 		if (slot.slotType != EquipmentSlotType.FishingRodSlot)

@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
- * Copyright 2024 Jiamu Sun <barroit@linux.com>
+ * Copyright 2024, 2025 Jiamu Sun <barroit@linux.com>
  */
 
 using System;
 using UnityEngine;
 
-public class License : MonoBehaviour
-{
+public class License : MonoBehaviour {
 
 [TextArea(5, 10)]
 public string license;

@@ -6,8 +6,7 @@
 using PugMod;
 using UnityEngine;
 
-public class Autofish : IMod
-{
+public class Autofish : IMod {
 
 public static readonly string NAME = "autofish";
 

@@ -16,14 +16,13 @@ using static CommandInputButtonNames;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
 public struct FisherCD : IComponentData {
-	public TickTimer clicking;
-	public bool pulled;
-	public bool enabled;
+	public TickTimer tmr;
+	public bool active;
 }
 
 [Serializable]
 struct Preference {
-	public bool enabled;
+	public bool active;
 };
 
 [BurstCompile]
@@ -36,7 +35,7 @@ public static Entity entity;
 public static EntityManager manager;
 
 private Preference pref = new Preference {
-	enabled = true,
+	active = true,
 };
 
 protected override void OnCreate()
@@ -47,9 +46,8 @@ protected override void OnCreate()
 
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
 	FisherCD fisher = new FisherCD {
-		clicking = new TickTimer(0.1f, rate),
-		pulled   = false,
-		enabled  = pref.enabled,
+		tmr    = new TickTimer(0.2f, rate),
+		active = pref.active,
 	};
 
 	manager.SetComponentData(entity, fisher);
@@ -64,7 +62,7 @@ protected override void OnUpdate()
 	RefRW<FisherCD> __fisher = SystemAPI.GetSingletonRW<FisherCD>();
 	FisherCD fisher = __fisher.ValueRW;
 
-	if (!fisher.enabled)
+	if (!fisher.active)
 		return;
 
 	foreach (var (__input, __fishing, __player, __slot) in
@@ -86,35 +84,25 @@ protected override void OnUpdate()
 
 		if (Manager.ui.isAnyInventoryShowing ||
 		    Manager.menu.IsAnyMenuActive()) {
-			fisher.pulled = false;
-			if (fisher.clicking.isRunning)
-				fisher.clicking.Stop(tick);
+			if (fisher.tmr.isRunning)
+				fisher.tmr.Stop(tick);
 			continue;
 		}
 
-		if (input.IsButtonSet(SecondInteract_HeldDown)) {
-			fisher.pulled = false;
+		if (input.IsButtonSet(SecondInteract_HeldDown))
 			goto next;
-		}
 
-		if (fisher.clicking.isRunning) {
-			if (!fisher.clicking.IsTimerElapsed(tick)) {
+		if (fisher.tmr.isRunning) {
+			if (!fisher.tmr.IsTimerElapsed(tick)) {
 				input.SetButton(SecondInteract_HeldDown, true);
 				goto next;
 			}
 
-			fisher.clicking.Stop(tick);
+			fisher.tmr.Stop(tick);
 		}
 
-		if (fisher.pulled &&
-		    player.currentState != PlayerStateEnum.Fishing) {
-			fisher.clicking.Start(tick);
-			fisher.pulled = false;
-		} else if (fishing.fishIsNibbling &&
-			   !fishing.isFishingAtOctopusBoss) {
-			fisher.clicking.Start(tick);
-			fisher.pulled = true;
-		}
+		if (fishing.fishIsNibbling &&!fishing.isFishingAtOctopusBoss)
+			fisher.tmr.Start(tick);
 
 next:
 		__input.ValueRW = As<ClientInput, ClientInputData>(ref input);
@@ -127,7 +115,7 @@ protected override void OnDestroy()
 {
 	FisherCD fisher = SystemAPI.GetSingleton<FisherCD>();
 
-	pref.enabled = fisher.enabled;
+	pref.active = fisher.active;
 	Pconf.set("settings", pref);
 }
 

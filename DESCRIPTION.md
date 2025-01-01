@@ -16,7 +16,7 @@ A lightweight and user-friendly auto fishing mod by barroit.
 
 Normally, you just get close to the shore and cast the rod. After that, Autofish handles reeling and recasting for you. If you want to disable the fisher, the switch is located under the sort button in your player inventory.
 
-Alternatively, if you don’t need the switch button or don’t use the fishing mini-game at all, you can download <code>v0.1-fisher-only</code> (uploading it later). That version keeps runtime overhead to a minimum.
+Alternatively, if you don’t need the switch button or don’t use the fishing mini-game at all, you can download <code>v0.1-fisher-only</code>. That version keeps runtime overhead to a minimum.
 
 ### Bug report
 
@@ -48,7 +48,7 @@ Please include:
 
 普通に、岸に近づいて竿を投げればいいです。そうすると、自動釣り機能が動作します。釣り機能をオフにしたいときは、インベントリの並べ替えボタンの下にあるスイッチを押してください。
 
-また、スイッチボタンやミニゲームを使わない場合、<code>v0.1-fisher-only</code>（後でアップロードします）を使ってください。このバージョンはランタイムのオーバーヘッドを最小限に抑えています。
+また、スイッチボタンやミニゲームを使わない場合、<code>v0.1-fisher-only</code>を使ってください。このバージョンはランタイムのオーバーヘッドを最小限に抑えています。
 
 ### バグリポート
 
@@ -80,7 +80,7 @@ Please include:
 
 通常，你只需靠近岸边并抛出鱼竿即可。之后，Autofish 会帮你收线和重新抛竿。如果你想禁用自动钓鱼，开关位于玩家库存中的排序按钮下方。
 
-或者，如果你不需要开关按钮或根本不使用钓鱼小游戏，你可以下载 <code>v0.1-fisher-only</code>（稍后上传）。该版本将运行时开销保持在最低限度。
+或者，如果你不需要开关按钮或根本不使用钓鱼小游戏，你可以下载 <code>v0.1-fisher-only</code>。该版本将运行时开销保持在最低限度。
 
 ### Bug 报告
 

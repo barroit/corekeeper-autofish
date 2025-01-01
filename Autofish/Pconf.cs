@@ -10,15 +10,27 @@
  * equally clueless.
  */
 
-using System.Text;
-using UnityEngine;
+using System;
+using System.Text.Json;
 
 using PugMod;
 
-public class Pconf
-{
+/*
+ * FIXME: Maybe we should stick to lowercase + underscore.
+ */
+
+[Serializable]
+struct Filedata<T> {
+	public string name;
+	public T value;
+}
+
+public class Pconf {
 
 private static Pconf pconf;
+private static JsonSerializerOptions json_conf = new JsonSerializerOptions {
+	IncludeFields = true,
+};
 
 private string mod;
 private IConfigFilesystem fs;
@@ -30,51 +42,62 @@ public Pconf(string mod, IConfigFilesystem fs)
 	pconf = this;
 }
 
-private T __get<T>(string name) where T : struct
+private bool __get<T>(string name, out T __data) where T : struct
 {
 	string file = $"{mod}/{name}.json";
 
+	__data = default;
 	if (!fs.FileExists(file))
-		return default;
+		return false;
 
-	byte[] data = fs.Read(file);
-	string json = Encoding.UTF8.GetString(data);
+	byte[] json = fs.Read(file);
+	Filedata<T> data;
 
-	return JsonUtility.FromJson<T>(json);
+	try {
+		data = JsonSerializer.Deserialize<Filedata<T>>(json,
+							       json_conf);
+	} catch (Exception) {
+		return false;
+	}
+
+	if (data.name != name)
+		return false;
+
+	__data = data.value;
+	return true;
 }
 
 public static T get<T>(string name) where T : struct
 {
-	return pconf.__get<T>(name);
-}
-
-private T __get<T>(string name, in T defval) where T : struct
-{
-	T ret = get<T>(name);
-
-	if (!default(T).Equals(ret))
-		return ret;
-
-	set(name, in defval);
-	return defval;
+	pconf.__get(name, out T ret);
+	return ret;
 }
 
 public static T get<T>(string name, in T defval) where T : struct
 {
-	return pconf.__get(name, defval);
+	bool pass = pconf.__get(name, out T ret);
+
+	if (pass)
+		return ret;
+
+	pconf.__set(name, in defval);
+	return defval;
 }
 
-private void __set<T>(string name, in T value) where T : struct
+private void __set<T>(string name, in T __data) where T : struct
 {
 	string file = $"{mod}/{name}.json";
 
 	if (!fs.DirectoryExists(mod))
 		fs.CreateDirectory(mod);
 
-	string json = JsonUtility.ToJson(value, true);
-	byte[] data = Encoding.UTF8.GetBytes(json);
+	Filedata<T> data = new Filedata<T> {
+		name = name,
+		value = __data,
+	};
+	byte[] json = JsonSerializer.SerializeToUtf8Bytes(data, json_conf);
 
-	fs.Write(file, data);
+	fs.Write(file, json);
 }
 
 public static void set<T>(string name, in T value) where T : struct

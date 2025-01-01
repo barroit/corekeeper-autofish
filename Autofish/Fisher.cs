@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
- * Copyright 2024 Jiamu Sun <barroit@linux.com>
+ * Copyright 2024, 2025 Jiamu Sun <barroit@linux.com>
  */
 
 using System;
@@ -15,27 +15,22 @@ using PlayerState;
 using static CommandInputButtonNames;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
-public struct FisherCD : IComponentData
-{
+public struct FisherCD : IComponentData {
 	public TickTimer clicking;
 	public bool pulled;
 	public bool enabled;
 }
 
 [Serializable]
-public struct Preference
-{
-
-public bool enabled;
-
-} /* struct Preference */
+struct Preference {
+	public bool enabled;
+};
 
 [BurstCompile]
 [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
 [UpdateInGroup(typeof(RunSimulationSystemGroup), OrderLast = true)]
 [UpdateAfter(typeof(SendClientInputSystem))]
-public partial class Fisher : SystemBase
-{
+public partial class Fisher : SystemBase {
 
 public static Entity entity;
 public static EntityManager manager;

@@ -41,21 +41,21 @@ Please include:
 - すぐに竿を上げて投げ直せます。
 - 釣りミニゲームに対応しています。
 - バックグラウンドで動かしながら自動釣りができます。
-- インベントリをひらいても自動釣りが止まりません。
+- インベントリをひらいても自動釣りの動きが崩れません。
 - 自動釣り機能をオンにするか選択できます。オフにすればミニゲームが楽しめます。
 
 ### 使い方
 
 普通に、岸に近づいて竿を投げればいいです。そうすると、自動釣り機能が動作します。釣り機能をオフにしたいときは、インベントリの並べ替えボタンの下にあるスイッチを押してください。
 
-また、スイッチボタンやミニゲームを使わない場合、<code>v0.1-fisher-only</code>を使ってください。このバージョンはランタイムのオーバーヘッドを最小限に抑えています。
+また、スイッチボタンやミニゲームを使わない場合、<code>v0.1-fisher-only</code>をご用意ください。このバージョンはランタイムのオーバーヘッドを最小限に抑えています。
 
 ### バグリポート
 
 使用中に何か問題やバグがあれば、以下のいずれかの方法で報告してください。
 
-- <a herf="https://github.com/barroit/corekeeper-autofish/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a> で Issue を作成。
-- <a href="mailto:Jiamu%20Sun%20%3Cbarroit@linux.com%3E?subject=%5Bbug-ck-autofish%5D%20Title%20goes%20here&amp;body=Describe%20the%20issue%20here." target="_blank" rel="noopener noreferrer">barroit@linux.com</a> にメールを送信。
+- <a herf="https://github.com/barroit/corekeeper-autofish/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a>
+- <a href="mailto:Jiamu%20Sun%20%3Cbarroit@linux.com%3E?subject=%5Bbug-ck-autofish%5D%20Title%20goes%20here&amp;body=Describe%20the%20issue%20here." target="_blank" rel="noopener noreferrer">barroit@linux.com</a>
 
 以下の内容を含めてください：
 

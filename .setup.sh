@@ -18,3 +18,13 @@ for file in *.asset*; do
 done
 
 ln -s $PWD/$name.meta $dest/$name.meta
+
+tmp=~/sandbox/corekeeper
+data=~/.config/unity3d/Pugstorm/Core\ Keeper
+game=~/.local/share/Steam/steamapps/common/Core\ Keeper
+mkdir -p $tmp
+
+ln -s "$data" $tmp/data
+ln -s "$game" $tmp/game
+ln -s "$data/Player.log" $tmp/log
+ln -s "$game/CoreKeeper_Data/StreamingAssets/Mods/$(cat name)" $tmp/mod

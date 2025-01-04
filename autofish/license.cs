@@ -6,15 +6,15 @@
 using System;
 using UnityEngine;
 
-public class License : MonoBehaviour {
+public class license : MonoBehaviour {
 
 [TextArea(5, 10)]
-public string license;
+public string text;
 
 void Awake()
 {
-	if (license == null)
+	if (text == null)
 		throw new Exception($"{gameObject.name} missing a license.");
 }
 
-} /* class License */
+} /* class license */

@@ -270,7 +270,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7670769345209013923}
-        m_TargetAssemblyTypeName: FisherSwitch, Autofish
+        m_TargetAssemblyTypeName: fisher_switch, autofish
         m_MethodName: toggle_state
         m_Mode: 1
         m_Arguments:
@@ -365,7 +365,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a152d3126fc7ffe9b145c80e80ef3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  license: 'SPDX-License-Identifier: GPL-3.0-or-later
+  text: 'SPDX-License-Identifier: GPL-3.0-or-later
 
 
     Copyright 2024 Jiamu

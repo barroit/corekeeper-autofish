@@ -7,7 +7,7 @@ using I2.Loc;
 using Unity.Entities;
 using UnityEngine;
 
-public class FisherSwitch : ButtonUIElement {
+public class fisher_switch : ButtonUIElement {
 
 public SpriteRenderer rod;
 
@@ -23,23 +23,23 @@ private readonly Color rod_enable = new Color(1f, 1f, 1f, 1f);
 
 public void toggle_state()
 {
-	EntityManager manager = Fisher.manager;
-	Entity entity = Fisher.entity;
-	FisherCD fisher = manager.GetComponentData<FisherCD>(Fisher.entity);
+	EntityManager manager = fisher.manager;
+	Entity entity = fisher.entity;
+	fisher_data data = manager.GetComponentData<fisher_data>(entity);
 
-	fisher.active = !fisher.active;
-	manager.SetComponentData(entity, fisher);
+	data.active = !data.active;
+	manager.SetComponentData(entity, data);
 }
 
 protected override void LateUpdate()
 {
-	EntityManager manager = Fisher.manager;
-	Entity entity = Fisher.entity;
-	FisherCD fisher = manager.GetComponentData<FisherCD>(entity);
+	EntityManager manager = fisher.manager;
+	Entity entity = fisher.entity;
+	fisher_data data = manager.GetComponentData<fisher_data>(entity);
 
 	base.LateUpdate();
 
-	if (fisher.active) {
+	if (data.active) {
 		rod.color = rod_enable;
 		optionalHoverDesc = btn_off_msg;
 	} else {
@@ -48,4 +48,4 @@ protected override void LateUpdate()
 	}
 }
 
-} /* class FisherSwitch */
+} /* class fisher_switch */

@@ -1,5 +1,5 @@
 ﻿{
-    "name": "Autofish",
+    "name": "autofish",
     "references": [
         "Unity.Burst",
         "Unity.Collections",

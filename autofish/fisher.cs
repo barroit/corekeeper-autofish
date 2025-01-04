@@ -14,13 +14,13 @@ using PlayerState;
 using static CommandInputButtonNames;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
-public struct FisherCD : IComponentData {
+public struct fisher_data : IComponentData {
 	public TickTimer tmr;
 	public bool active;
 }
 
 [Serializable]
-struct Preference {
+struct fisher_conf {
 	public bool active;
 };
 
@@ -28,23 +28,23 @@ struct Preference {
 [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
 [UpdateInGroup(typeof(RunSimulationSystemGroup), OrderLast = true)]
 [UpdateAfter(typeof(SendClientInputSystem))]
-public partial class Fisher : SystemBase {
+public partial class fisher : SystemBase {
 
 public static Entity entity;
 public static EntityManager manager;
 
-private Preference pref = new Preference {
+private fisher_conf pref = new fisher_conf {
 	active = true,
 };
 
 protected override void OnCreate()
 {
-	pref = Pconf.get("settings", pref);
+	pref = upref.get("settings", pref);
 	manager = EntityManager;
-	entity = manager.CreateSingleton<FisherCD>();
+	entity = manager.CreateSingleton<fisher_data>();
 
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
-	FisherCD fisher = new FisherCD {
+	fisher_data fisher = new fisher_data {
 		tmr    = new TickTimer(0.2f, rate),
 		active = pref.active,
 	};
@@ -58,8 +58,8 @@ protected override void OnUpdate()
 	NetworkTime time = SystemAPI.GetSingleton<NetworkTime>();
 	NetworkTick tick = time.ServerTick;
 
-	RefRW<FisherCD> __fisher = SystemAPI.GetSingletonRW<FisherCD>();
-	FisherCD fisher = __fisher.ValueRW;
+	RefRW<fisher_data> __fisher = SystemAPI.GetSingletonRW<fisher_data>();
+	fisher_data fisher = __fisher.ValueRW;
 
 	if (!fisher.active)
 		return;
@@ -110,10 +110,10 @@ next:
 
 protected override void OnDestroy()
 {
-	FisherCD fisher = SystemAPI.GetSingleton<FisherCD>();
+	fisher_data fisher = SystemAPI.GetSingleton<fisher_data>();
 
 	pref.active = fisher.active;
-	Pconf.set("settings", pref);
+	upref.set("settings", pref);
 }
 
-} /* partial class Fisher */
+} /* partial class fisher */

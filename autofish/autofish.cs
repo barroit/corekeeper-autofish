@@ -6,13 +6,13 @@
 using PugMod;
 using UnityEngine;
 
-public class Autofish : IMod {
+public class autofish : IMod {
 
-public static readonly string NAME = "autofish";
+public const string PROG_NAME = "autofish";
 
-private readonly string BTN_PREFAB = "Assets/Autofish/fisher_switch.prefab";
+private const string BTN_PREFAB = "Assets/autofish/fisher_switch.prefab";
 
-private LoadedMod autofish;
+private LoadedMod mod;
 private AssetBundle assets;
 
 private GameObject btn_prefab;
@@ -23,23 +23,23 @@ private int old_size = 0;
 
 public void EarlyInit()
 {
-	new Pconf(NAME, API.ConfigFilesystem);
+	new upref(PROG_NAME, API.ConfigFilesystem);
 }
 
 public void Init()
 {
 	inv = (InventoryUI)Manager.ui.playerInventoryUI;
 
-	foreach (LoadedMod mod in API.ModLoader.LoadedMods) {
-		if (mod.Handlers.Contains(this)) {
-			autofish = mod;
+	foreach (LoadedMod __mod in API.ModLoader.LoadedMods) {
+		if (__mod.Handlers.Contains(this)) {
+			mod = __mod;
 			break;
 		}
 	}
 
 	Transform root = inv.transform.GetChild(0);
 
-	assets = autofish.AssetBundles[0];
+	assets = mod.AssetBundles[0];
 	btn_prefab = assets.LoadAsset<GameObject>(BTN_PREFAB);
 
 	btn = Object.Instantiate(btn_prefab, root, false);
@@ -88,4 +88,4 @@ public void Update()
 	btn.transform.localPosition = new Vector3(x, y, z);
 }
 
-} /* class Autofish */
+} /* class autofish */

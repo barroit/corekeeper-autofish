@@ -14,7 +14,7 @@ unique solves this.
 
 Configuration
 -------------
-Autofish.asset metadata
+autofish.asset metadata
 
 	Leave MonoBehaviour.metadata.files empty and let SDK generate it
 	for us, as BurstCompile generates files with random names.

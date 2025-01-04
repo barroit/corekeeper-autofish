@@ -20,14 +20,14 @@ using PugMod;
  */
 
 [Serializable]
-struct Filedata<T> {
+struct pref_data<T> {
 	public string name;
 	public T value;
 }
 
-public class Pconf {
+public class upref {
 
-private static Pconf pconf;
+private static upref __this;
 private static JsonSerializerOptions json_conf = new JsonSerializerOptions {
 	IncludeFields = true,
 };
@@ -35,11 +35,11 @@ private static JsonSerializerOptions json_conf = new JsonSerializerOptions {
 private string mod;
 private IConfigFilesystem fs;
 
-public Pconf(string mod, IConfigFilesystem fs)
+public upref(string mod, IConfigFilesystem fs)
 {
 	this.mod = mod;
 	this.fs = fs;
-	pconf = this;
+	__this = this;
 }
 
 private bool __get<T>(string name, out T __data) where T : struct
@@ -51,10 +51,10 @@ private bool __get<T>(string name, out T __data) where T : struct
 		return false;
 
 	byte[] json = fs.Read(file);
-	Filedata<T> data;
+	pref_data<T> data;
 
 	try {
-		data = JsonSerializer.Deserialize<Filedata<T>>(json,
+		data = JsonSerializer.Deserialize<pref_data<T>>(json,
 							       json_conf);
 	} catch (Exception) {
 		return false;
@@ -69,18 +69,18 @@ private bool __get<T>(string name, out T __data) where T : struct
 
 public static T get<T>(string name) where T : struct
 {
-	pconf.__get(name, out T ret);
+	__this.__get(name, out T ret);
 	return ret;
 }
 
 public static T get<T>(string name, in T defval) where T : struct
 {
-	bool pass = pconf.__get(name, out T ret);
+	bool pass = __this.__get(name, out T ret);
 
 	if (pass)
 		return ret;
 
-	pconf.__set(name, in defval);
+	__this.__set(name, in defval);
 	return defval;
 }
 
@@ -91,7 +91,7 @@ private void __set<T>(string name, in T __data) where T : struct
 	if (!fs.DirectoryExists(mod))
 		fs.CreateDirectory(mod);
 
-	Filedata<T> data = new Filedata<T> {
+	pref_data<T> data = new pref_data<T> {
 		name = name,
 		value = __data,
 	};
@@ -102,7 +102,7 @@ private void __set<T>(string name, in T __data) where T : struct
 
 public static void set<T>(string name, in T value) where T : struct
 {
-	pconf.__set(name, value);
+	__this.__set(name, value);
 }
 
 } /* class Pconf */

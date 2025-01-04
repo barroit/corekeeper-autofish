@@ -1,4 +1,4 @@
-Core Keeper Autofish
+Core Keeper autofish
 ====================
 
 Autofish is a lightweight, life-saving tool for automated fishing. Whether

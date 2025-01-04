@@ -14,11 +14,6 @@ using PlayerState;
 using static CommandInputButtonNames;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
-public struct fisher_data : IComponentData {
-	public TickTimer tmr;
-	public bool active;
-}
-
 [Serializable]
 struct fisher_conf {
 	public bool active;
@@ -30,8 +25,8 @@ struct fisher_conf {
 [UpdateAfter(typeof(SendClientInputSystem))]
 public partial class fisher : SystemBase {
 
-public static Entity entity;
-public static EntityManager manager;
+public static TickTimer tmr;
+public static bool active;
 
 private fisher_conf pref = new fisher_conf {
 	active = true,
@@ -39,17 +34,12 @@ private fisher_conf pref = new fisher_conf {
 
 protected override void OnCreate()
 {
-	pref = upref.get("settings", pref);
-	manager = EntityManager;
-	entity = manager.CreateSingleton<fisher_data>();
-
 	uint rate = (uint)NetworkingManager.GetSimulationTickRateForPlatform();
-	fisher_data fisher = new fisher_data {
-		tmr    = new TickTimer(0.2f, rate),
-		active = pref.active,
-	};
 
-	manager.SetComponentData(entity, fisher);
+	pref = upref.get("settings", pref);
+
+	tmr = new TickTimer(0.2f, rate);
+	active = pref.active;
 }
 
 [BurstCompile]
@@ -58,10 +48,7 @@ protected override void OnUpdate()
 	NetworkTime time = SystemAPI.GetSingleton<NetworkTime>();
 	NetworkTick tick = time.ServerTick;
 
-	RefRW<fisher_data> __fisher = SystemAPI.GetSingletonRW<fisher_data>();
-	fisher_data fisher = __fisher.ValueRW;
-
-	if (!fisher.active)
+	if (!active)
 		return;
 
 	foreach (var (__input, __fishing, __slot) in
@@ -81,8 +68,8 @@ protected override void OnUpdate()
 
 		if (Manager.ui.isAnyInventoryShowing ||
 		    Manager.menu.IsAnyMenuActive()) {
-			if (fisher.tmr.isRunning)
-				fisher.tmr.Stop(tick);
+			if (tmr.isRunning)
+				tmr.Stop(tick);
 			continue;
 		}
 
@@ -90,29 +77,25 @@ protected override void OnUpdate()
 			goto next;
 
 		if (fisher.tmr.isRunning) {
-			if (!fisher.tmr.IsTimerElapsed(tick)) {
+			if (!tmr.IsTimerElapsed(tick)) {
 				input.SetButton(SecondInteract_HeldDown, true);
 				goto next;
 			}
 
-			fisher.tmr.Stop(tick);
+			tmr.Stop(tick);
 		}
 
 		if (fishing.fishIsNibbling &&!fishing.isFishingAtOctopusBoss)
-			fisher.tmr.Start(tick);
+			tmr.Start(tick);
 
 next:
 		__input.ValueRW = As<ClientInput, ClientInputData>(ref input);
 	}
-
-	__fisher.ValueRW = fisher;
 }
 
 protected override void OnDestroy()
 {
-	fisher_data fisher = SystemAPI.GetSingleton<fisher_data>();
-
-	pref.active = fisher.active;
+	pref.active = active;
 	upref.set("settings", pref);
 }
 

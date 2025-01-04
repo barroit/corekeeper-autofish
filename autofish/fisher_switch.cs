@@ -4,7 +4,6 @@
  */
 
 using I2.Loc;
-using Unity.Entities;
 using UnityEngine;
 
 public class fisher_switch : ButtonUIElement {
@@ -23,23 +22,14 @@ private readonly Color rod_enable = new Color(1f, 1f, 1f, 1f);
 
 public void toggle_state()
 {
-	EntityManager manager = fisher.manager;
-	Entity entity = fisher.entity;
-	fisher_data data = manager.GetComponentData<fisher_data>(entity);
-
-	data.active = !data.active;
-	manager.SetComponentData(entity, data);
+	fisher.active = !fisher.active;
 }
 
 protected override void LateUpdate()
 {
-	EntityManager manager = fisher.manager;
-	Entity entity = fisher.entity;
-	fisher_data data = manager.GetComponentData<fisher_data>(entity);
-
 	base.LateUpdate();
 
-	if (data.active) {
+	if (fisher.active) {
 		rod.color = rod_enable;
 		optionalHoverDesc = btn_off_msg;
 	} else {

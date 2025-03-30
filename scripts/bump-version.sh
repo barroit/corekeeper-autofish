@@ -1,0 +1,1 @@
+../../barroit/scripts/bump-version.sh

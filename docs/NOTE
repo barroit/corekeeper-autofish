@@ -1,0 +1,28 @@
+                                     NOTE
+
+
+Setup project
+-------------
+Just run scripts/setup.sh. This script creates the necessary symlinks in the
+SDK directory.
+
+
+Generated files
+---------------
+Ensure that Scripts/Generated/ exists in the mod directory. The compiled
+SystemAPI queries will be stored there.
+
+
+Uploading mod
+-------------
+Be aware that mod.io may wrap an extra directory around the uploaded mod,
+which breaks Core Keeper's mod loading. Giving the zip file an aggressively
+unique name tends to avoid this.
+
+
+Configuration
+-------------
+autofish.asset metadata:
+
+	Leave MonoBehaviour.metadata.files empty and let the SDK generate it
+	for us, since BurstCompile creates files with random names.

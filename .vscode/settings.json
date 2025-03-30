@@ -6,9 +6,9 @@
 		}
 	},
 	"files.associations": {
-		"DRAFT": "plaintext",
-		"TAGGING": "plaintext",
-		"NOTE": "plaintext",
-		"SETUP": "plaintext"
+		"**/docs/**": "plaintext"
+	},
+	"search.exclude": {
+		"**/.corekeeper": true
 	}
 }

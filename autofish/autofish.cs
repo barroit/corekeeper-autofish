@@ -21,6 +21,9 @@ private GameObject btn;
 private InventoryUI inv;
 private int old_size = 0;
 
+private const float x = -7.625f;
+private const float y = -5.5625f;
+
 public void EarlyInit()
 {
 	new upref(PROG_NAME, API.ConfigFilesystem);
@@ -58,11 +61,6 @@ public bool CanBeUnloaded()
 	return true;
 }
 
-private float side_offsetof(int size, float spread)
-{
-	return (0f - (size - 1) / 2f) * spread;
-}
-
 public void Update()
 {
 	if (!Manager.ui.isPlayerInventoryShowing)
@@ -75,14 +73,6 @@ public void Update()
 		return;
 	old_size = new_size;
 
-	int col = handler.columns;
-	int row = Mathf.CeilToInt((float)new_size / col);
-
-	float col_off = side_offsetof(col, inv.spread);
-	float row_off = side_offsetof(row, inv.spread);
-
-	float x = 0f - col_off + 1.5f;
-	float y = 0f - row_off - 1.5f - 1.375f;
 	float z = btn.transform.localPosition.z;
 
 	btn.transform.localPosition = new Vector3(x, y, z);

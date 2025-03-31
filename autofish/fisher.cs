@@ -11,7 +11,7 @@ using Unity.NetCode;
 using PlayerEquipment;
 using PlayerState;
 
-using static CommandInputButtonNames;
+using static CommandInputButtonStateNames;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
 public struct fisher_data : IComponentData {
@@ -86,12 +86,13 @@ protected override void OnUpdate()
 			continue;
 		}
 
-		if (input.IsButtonSet(SecondInteract_HeldDown))
+		if (input.IsButtonStateSet(SecondInteract_HeldDown))
 			goto next;
 
 		if (fisher.tmr.isRunning) {
 			if (!fisher.tmr.IsTimerElapsed(tick)) {
-				input.SetButton(SecondInteract_HeldDown, true);
+				input.SetButtonState(SecondInteract_HeldDown,
+						     true);
 				goto next;
 			}
 

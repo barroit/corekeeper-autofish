@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: 0BSD
+
+name: docs
+
+on:
+   push:
+      branches:
+         - master
+      paths:
+         - Documentation/**
+   workflow_dispatch:
+
+permissions:
+   contents: read
+   pages:    write
+   id-token: write
+
+concurrency:
+   group: pages
+   cancel-in-progress: false
+
+jobs:
+   build:
+      runs-on: ubuntu-24.04
+      steps:
+         - uses: actions/checkout@v4
+           with:
+              path: master
+
+         - uses: actions/checkout@v4
+           with:
+              repository: barroit/barroit
+              path: barroit
+
+         - uses: actions/setup-python@v5
+           with:
+              python-version: 3.13
+
+         - run: pip install sphinx==8.2.3
+
+         - run: make html
+           working-directory: master/Documentation
+
+         - uses: actions/upload-pages-artifact@v3
+           with:
+              path: master/Documentation/build/html
+
+   deploy:
+      needs:   build
+      runs-on: ubuntu-24.04
+      environment:
+         name: github-pages
+         url:  ${{ steps.deployment.outputs.page_url }}
+      steps:
+         - id:   deployment
+           uses: actions/deploy-pages@v4

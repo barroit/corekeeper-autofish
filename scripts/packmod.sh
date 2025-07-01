@@ -9,5 +9,8 @@ name=$(printf '%s\n' $name | tr 'A-Z' 'a-z')
 prefix=$HOME/.local/share/Steam/steamapps/common/Core\ Keeper
 prefix="$prefix/CoreKeeper_Data/StreamingAssets/Mods/$name"
 
+verion=$(git tag --sort=-version:refname | head -1)
+
 cd "$prefix"
-zip -r $(pwd)/$name.zip .
+pwd
+zip -r "$(pwd)/$name-$verion.zip" .

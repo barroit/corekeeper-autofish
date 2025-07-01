@@ -11,7 +11,8 @@
  */
 
 using System;
-using System.Text.Json;
+using System.Text;
+using UnityEngine;
 
 using PugMod;
 
@@ -28,9 +29,6 @@ struct pref_data<T> {
 public class upref {
 
 private static upref __this;
-private static JsonSerializerOptions json_conf = new JsonSerializerOptions {
-	IncludeFields = true,
-};
 
 private string mod;
 private IConfigFilesystem fs;
@@ -50,12 +48,12 @@ private bool __get<T>(string name, out T __data) where T : struct
 	if (!fs.FileExists(file))
 		return false;
 
-	byte[] json = fs.Read(file);
-	pref_data<T> data;
+	byte[] raw = fs.Read(file);
+	string json = Encoding.UTF8.GetString(raw);
+	pref_data<T> data = new pref_data<T>();
 
 	try {
-		data = JsonSerializer.Deserialize<pref_data<T>>(json,
-							       json_conf);
+		JsonUtility.FromJsonOverwrite(json, data);
 	} catch (Exception) {
 		return false;
 	}
@@ -95,9 +93,10 @@ private void __set<T>(string name, in T __data) where T : struct
 		name = name,
 		value = __data,
 	};
-	byte[] json = JsonSerializer.SerializeToUtf8Bytes(data, json_conf);
+	string json = JsonUtility.ToJson(data, prettyPrint: true);
+	byte[] raw = Encoding.UTF8.GetBytes(json);
 
-	fs.Write(file, json);
+	fs.Write(file, raw);
 }
 
 public static void set<T>(string name, in T value) where T : struct

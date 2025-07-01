@@ -56,6 +56,10 @@ public void Shutdown() {}
  */
 public void ModObjectLoaded(Object _) {}
 
+/*
+ * OOP people's brains are smooth. They just can't understand short names like
+ * 'unloadable'.
+ */
 public bool CanBeUnloaded()
 {
 	return true;

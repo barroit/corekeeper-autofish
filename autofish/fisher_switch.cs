@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * Copyright 2024, 2025 Jiamu Sun <barroit@linux.com>
+ *
+ * bg		trashcan_ui_9
+ * bg_press	trashcan_ui_9
+ * marker	crafting_ui_hand_15
  */
 
 using I2.Loc;

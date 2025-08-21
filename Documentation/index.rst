@@ -15,8 +15,7 @@ Here's the tool used to setup this repo. Before hacking, just run this script::
 
 	scripts/sdk-setup.sh
 
-It symlinks some useful files to .corekeeper/ directory. Without this, you get
-pain.
+It symlinks some useful files to .ck/ directory. Without this, you get pain.
 
 .. FIXME: add more documents here, but not for now, my laziness says no.
 

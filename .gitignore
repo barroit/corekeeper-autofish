@@ -2,6 +2,6 @@
 
 /.tmp
 /*.zip
-/.corekeeper
+/.ck
 
 /Documentation/build

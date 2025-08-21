@@ -9,6 +9,6 @@
 		"**/docs/**": "plaintext"
 	},
 	"search.exclude": {
-		"**/.corekeeper": true
+		"**/.ck": true
 	}
 }

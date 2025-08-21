@@ -5,23 +5,22 @@ set -e
 
 test -n "$1"
 
-sdk_root=$(realpath $1)
-assets_root=$sdk_root/Assets
+sdk=$(realpath $1)
+assets=$sdk/Assets
 
-name=$(cat NAME)
-name=$(printf '%s\n' $name | tr 'A-Z' 'a-z')
+name=$(printf '%s\n' $(cat NAME) | tr 'A-Z' 'a-z')
 
 for file in $name *.asset *.meta; do
-	ln -sfn $(pwd)/$file $assets_root/$file
+	ln -snf $PWD/$file $assets/$file
 done
 
-data_dir=$HOME/.config/unity3d/Pugstorm/Core\ Keeper
-game_dir=$HOME/.local/share/Steam/steamapps/common/Core\ Keeper
+data=$HOME/.config/unity3d/Pugstorm/Core\ Keeper
+game=$HOME/.local/share/Steam/steamapps/common/Core\ Keeper
 
-mkdir -p .corekeeper
-cd .corekeeper
+mkdir -p .ck
+cd .ck
 
-ln -sfn "$data_dir" data
-ln -sfn "$game_dir" game
-ln -sfn "$data_dir/Player.log" log
-ln -sfn "$game_dir/CoreKeeper_Data/StreamingAssets/Mods/$name" mod
+ln -sfn "$data" data
+ln -sfn "$game" game
+ln -sfn "$data/Player.log" log
+ln -sfn "$game/CoreKeeper_Data/StreamingAssets/Mods/$name" mod

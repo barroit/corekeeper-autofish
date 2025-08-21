@@ -3,14 +3,14 @@
 
 set -e
 
+root=$PWD
+
 name=$(cat NAME)
 name=$(printf '%s\n' $name | tr 'A-Z' 'a-z')
+version=$(git tag --sort=-version:refname | head -1)
+archive=$name-$version.zip
 
-prefix=$HOME/.local/share/Steam/steamapps/common/Core\ Keeper
-prefix="$prefix/CoreKeeper_Data/StreamingAssets/Mods/$name"
+cd .ck/mod
 
-verion=$(git tag --sort=-version:refname | head -1)
-
-cd "$prefix"
-pwd
-zip -r "$(pwd)/$name-$verion.zip" .
+zip -r $PWD/$archive .
+cp $archive $root/.tmp

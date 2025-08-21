@@ -7,12 +7,14 @@ using System;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.NetCode;
+using Unity.Collections;
 
 using PlayerEquipment;
 using PlayerState;
 
 using static CommandInputButtonStateNames;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
+using static Unity.Entities.EntityQueryOptions;
 
 public struct fisher_data : IComponentData {
 	public TickTimer tmr;
@@ -37,6 +39,8 @@ private fisher_conf pref = new fisher_conf {
 	active = true,
 };
 
+private EntityQuery net_time_query;
+
 protected override void OnCreate()
 {
 	pref = upref.get("settings", pref);
@@ -50,12 +54,17 @@ protected override void OnCreate()
 	};
 
 	manager.SetComponentData(entity, fisher);
+
+	EntityQueryBuilder builder = new EntityQueryBuilder(Allocator.Temp);
+
+	net_time_query = builder.WithAll<NetworkTime>()
+				.WithOptions(IncludeSystems).Build(this);
 }
 
 [BurstCompile]
 protected override void OnUpdate()
 {
-	NetworkTime time = SystemAPI.GetSingleton<NetworkTime>();
+	NetworkTime time = net_time_query.GetSingleton<NetworkTime>();
 	NetworkTick tick = time.ServerTick;
 
 	RefRW<fisher_data> __fisher = SystemAPI.GetSingletonRW<fisher_data>();

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-.PHONY: decompile pack
+.PHONY: decompile pack readme
 
 pack:
 
@@ -8,7 +8,7 @@ pack:
 	scripts/sdk-setup.sh ./ck-sdk
 
 %/:
-	mkdir $@
+	mkdir -p $@
 
 decompile: .ck/ .tmp/lib/
 	cd .ck/game/CoreKeeper_Data/Managed && \
@@ -16,3 +16,6 @@ decompile: .ck/ .tmp/lib/
 
 pack:
 	scripts/pack.sh
+
+readme: .tmp/
+	rst2html5 --template=README.fmt README.rst .tmp/README.html

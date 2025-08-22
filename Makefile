@@ -18,4 +18,4 @@ pack:
 	scripts/pack.sh
 
 readme: .tmp/
-	rst2html5 --template=README.fmt README.rst .tmp/README.html
+	rst2html5 --template=NOT-README.fmt NOT-README.rst .tmp/IS-README.html
